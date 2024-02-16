@@ -16,7 +16,7 @@ const GlobalStyles = createGlobalStyle`
   ${({ theme }) => css`
     html {
       font-size: 62.5%;
-      font-family: Poppins, sans-serif;
+      font-family: Galindo, sans-serif;
 
       /* @media ${device.desktop} {
         font-size: 110%;

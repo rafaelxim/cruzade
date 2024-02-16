@@ -1,7 +1,8 @@
 import * as S from "./styles";
 import ReturnArrow from "../../assets/return-104.png";
 import NextArrow from "../../assets/next.svg";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { fillArrayWithLetter, shuffleString } from "../../helpers";
 
 type Question = {
   id: number;
@@ -9,6 +10,7 @@ type Question = {
   description: string;
   answer: string;
   answerSquares: number[];
+  isComplete?: boolean;
 };
 
 const CRUZADE_QUESTIONS: Question[] = [
@@ -30,19 +32,65 @@ const CRUZADE_QUESTIONS: Question[] = [
 
 const Game = () => {
   const items = new Array(72).fill(null);
+  const [cruzadeQuestions, setCruzadeQuestions] =
+    useState<Question[]>(CRUZADE_QUESTIONS);
   const [selectedQuestion, setSelectedQuestion] = useState<Question>();
+  const [answerLetters, setAnswerLetters] = useState<string[]>([]);
 
   const getMainSquare = (index: number) => {
-    return CRUZADE_QUESTIONS.find((c) => c.mainSquare === index);
+    return cruzadeQuestions.find((c) => c.mainSquare === index);
   };
 
   const handleClickSquare = (index: number) => {
-    console.log(index);
     const mainSquare = getMainSquare(index);
 
     if (mainSquare) {
       setSelectedQuestion(mainSquare);
+      setAnswerLetters(new Array(mainSquare.answer.length).fill(""));
     }
+  };
+
+  const handleClickOptionLetter = (l: string) => {
+    const filled = fillArrayWithLetter(l, answerLetters);
+    setAnswerLetters(filled);
+    checkFinishedAnswer(filled);
+  };
+
+  const checkFinishedAnswer = (filled: string[]) => {
+    if (!filled.includes("")) {
+      setAnswerLetters(new Array(selectedQuestion!.answer.length).fill(""));
+
+      if (filled.join("") === selectedQuestion?.answer) {
+        const updatedCruzades = cruzadeQuestions.map((c) => {
+          if (c.id === selectedQuestion.id) {
+            return {
+              ...c,
+              isComplete: true,
+            };
+          }
+          return c;
+        });
+
+        setCruzadeQuestions(updatedCruzades);
+      }
+    }
+  };
+
+  const shuffledOptions = useMemo(() => {
+    return shuffleString(selectedQuestion?.answer).split("");
+  }, [selectedQuestion]);
+
+  const getLetterByIndex = (index: number) => {
+    const cruzade = cruzadeQuestions.find((c) =>
+      c.answerSquares.includes(index)
+    );
+
+    if (cruzade && cruzade?.isComplete) {
+      const iOf = cruzade.answerSquares.indexOf(index);
+      return cruzade.answer[iOf];
+    }
+
+    return "";
   };
 
   return (
@@ -61,7 +109,7 @@ const Game = () => {
               }
               key={index}
             >
-              {getMainSquare(index)?.description}
+              {getMainSquare(index)?.description || getLetterByIndex(index)}
             </S.GridItem>
           ))}
         </S.GameGrid>
@@ -71,7 +119,20 @@ const Game = () => {
         <S.HintText>{selectedQuestion?.description}</S.HintText>
         <S.HintAction src={NextArrow} />
       </S.Hint>
-      <S.Letters />
+      <S.Letters>
+        <S.AnswerBox>
+          {answerLetters?.map((l) => (
+            <S.AnswerLetter>{l}</S.AnswerLetter>
+          ))}
+        </S.AnswerBox>
+        <S.AnswerOptionsBox>
+          {shuffledOptions.map((l) => (
+            <S.AnswerOptionLetter onClick={() => handleClickOptionLetter(l)}>
+              {l}
+            </S.AnswerOptionLetter>
+          ))}
+        </S.AnswerOptionsBox>
+      </S.Letters>
     </S.Wrapper>
   );
 };

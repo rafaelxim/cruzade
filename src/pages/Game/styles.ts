@@ -36,6 +36,7 @@ type GridItemProps = {
 const GridItemModifier = {
   isMainSquare: () => css`
     background-color: #cfcfcf;
+    font-size: 0.75rem;
   `,
   isSelectedSquare: () => css`
     background-color: #cfe8ff;
@@ -45,10 +46,13 @@ const GridItemModifier = {
 export const GridItem = styled.div<GridItemProps>`
   ${({ isMainSquare, isSelectedSquare }) => css`
     background-color: #fcfcfc;
-    font-size: 0.75rem;
     max-width: 100%; /* ou outro valor que você considerar adequado */
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     ${isMainSquare && GridItemModifier.isMainSquare()}
     ${isSelectedSquare && GridItemModifier.isSelectedSquare()}
@@ -64,6 +68,7 @@ export const Hint = styled.section`
   display: flex;
   justify-content: space-around;
   align-items: center;
+  gap: 0 1rem;
 `;
 export const Letters = styled.section`
   background-color: #979797;
@@ -88,4 +93,32 @@ export const HintAction = styled.img<HintActionProps>`
   `}
   width: 2rem;
 `;
-export const HintText = styled.p``;
+export const HintText = styled.p`
+  font-size: 1.5rem;
+`;
+
+export const AnswerBox = styled.div`
+  display: flex;
+  gap: 0 1rem;
+  padding: 0 2rem;
+  margin-top: 2rem;
+`;
+export const AnswerLetter = styled.div`
+  min-height: 5rem;
+  flex: 1;
+  border-bottom: 2px solid #fff;
+`;
+export const AnswerOptionsBox = styled.div`
+  margin-top: 5rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-gap: 0.5rem;
+  padding: 0 2rem;
+  font-size: 2rem;
+`;
+
+export const AnswerOptionLetter = styled.div`
+  background-color: #d9d9d9;
+  text-align: center;
+`;
